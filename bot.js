@@ -10,21 +10,31 @@ const client = new Client({
 
 const TOKEN = ''; 
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`${client.user.tag} olarak giriş yaptım!`);
-    
-    
+
     client.user.setPresence({
-        status: 'dnd',
+        status: 'dnd', 
         activities: [{ name: 'SUNUCU GÜVENDE TOOLUNUZU YEDİMM HAMM', type: 'WATCHING' }] 
     });
 });
 
 client.on('messageCreate', async (message) => {
 
-    if (!message.author.bot && !message.webhookId) return; 
+    if (message.webhookId) return;
 
-   
+    
+    if (message.author.tag === 'Shadow Raider#7461') {
+        try {
+            await message.delete();
+            console.log(`"Shadow Raider#7461" tarafından gönderilen mesaj silindi: ${message.content}`);
+        } catch (err) {
+            console.error('Hata oluştu:', err);
+        }
+        return;
+    }
+
+
     const inviteRegex = /(https?:\/\/)?(www\.)?(discord\.gg|discordapp\.com\/invite)\/[a-zA-Z0-9_-]+/gi;
     if (inviteRegex.test(message.content)) {
         try {
@@ -36,25 +46,8 @@ client.on('messageCreate', async (message) => {
         return;
     }
 
-   
-    if (message.author.tag === 'Shadow Raider#7461') {
-        try {
-            await message.delete();
-            console.log(`Shadow Raider#7461 tarafından gönderilen mesaj silindi: ${message.content}`);
-            
-            const member = await message.guild.members.fetch(message.author.id).catch(() => null);
-            if (member) {
-                await member.ban({ reason: 'Otomatik sistem tarafından yasaklandı.' });
-                console.log('Shadow Raider#7461 sunucudan banlandı.');
-            }
-        } catch (err) {
-            console.error('Hata oluştu:', err);
-        }
-        return;
-    }
-    
+
     const member = await message.guild.members.fetch(message.author.id).catch(() => null);
-  
     if (!member) {
         try {
             await message.delete(); 
